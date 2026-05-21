@@ -2,7 +2,7 @@
   "name": "3d-china-chess",
   "private": true,
   "scripts": {
-    "dev": "concurrently -n client,server -c cyan,magenta \"pnpm --filter @xq/client dev\" \"pnpm --filter @xq/server dev\"",
+    "dev": "pnpm --filter @xq/shared build && concurrently -n client,server -c cyan,magenta \"pnpm --filter @xq/client dev\" \"pnpm --filter @xq/server dev\"",
     "build": "pnpm --filter @xq/shared build && pnpm --filter @xq/client build && pnpm --filter @xq/server build",
     "test": "pnpm -r test",
     "lint": "pnpm -r lint",
