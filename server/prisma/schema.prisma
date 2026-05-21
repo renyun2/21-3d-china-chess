@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String
+  elo          Int      @default(1500)
+  avatarUrl    String?
+  createdAt    DateTime @default(now())
+  gamesWhite   Game[]   @relation("WhiteGames")
+  gamesBlack   Game[]   @relation("BlackGames")
+  friendshipsA Friendship[] @relation("UserA")
+  friendshipsB Friendship[] @relation("UserB")
+  chatMessages ChatMessage[]
+}
+
+model Game {
+  id            String   @id @default(cuid())
+  fen           String
+  moves         String   @default("")
+  pgn           String   @default("")
+  result        String?
+  endReason     String?
+  timeControl   String
+  mode          String   @default("pvp")
+  whiteUserId   String?
+  blackUserId   String?
+  whiteUser     User?    @relation("WhiteGames", fields: [whiteUserId], references: [id])
+  blackUser     User?    @relation("BlackGames", fields: [blackUserId], references: [id])
+  createdAt     DateTime @default(now())
+  finishedAt    DateTime?
+}
+
+model Friendship {
+  id        String   @id @default(cuid())
+  userAId   String
+  userBId   String
+  status    String   @default("pending")
+  userA     User     @relation("UserA", fields: [userAId], references: [id])
+  userB     User     @relation("UserB", fields: [userBId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([userAId, userBId])
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  roomId    String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  text      String
+  createdAt DateTime @default(now())
+}
